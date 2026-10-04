@@ -3,10 +3,7 @@ package library.example.libraryManagementSystem.controller;
 
 import library.example.libraryManagementSystem.dto.BookRequestDto;
 import library.example.libraryManagementSystem.dto.BookResponseDto;
-import library.example.libraryManagementSystem.entity.Book;
-import library.example.libraryManagementSystem.service.LibraryService;
-import org.hibernate.annotations.SoftDelete;
-import org.jspecify.annotations.Nullable;
+import library.example.libraryManagementSystem.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,23 +13,23 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/library")
-public class LibraryController {
+public class BookController {
 
-    private LibraryService libraryService;
-    public LibraryController(LibraryService libraryService) {
-        this.libraryService = libraryService;
+    private BookService bookService;
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
     }
 
     @PostMapping
     public ResponseEntity<String> addBookToLibrary(@RequestBody BookRequestDto bookRequestDto){
 
-        libraryService.addBook(bookRequestDto);
+        bookService.addBook(bookRequestDto);
         return ResponseEntity.ok("book added successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDto> getBookById(@PathVariable Long id){
-      Optional<BookResponseDto> foundedBook = libraryService.getBookById(id);
+      Optional<BookResponseDto> foundedBook = bookService.getBookById(id);
     if(foundedBook.isPresent()){
         return ResponseEntity.ok(foundedBook.get());
     }
@@ -41,22 +38,23 @@ public class LibraryController {
 
     @GetMapping
     public ResponseEntity<List<BookResponseDto>> getAllBooks(){
-     List<BookResponseDto> bookList = libraryService.getAllBook();
+     List<BookResponseDto> bookList = bookService.getAllBook();
         return ResponseEntity.ok(bookList);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BookResponseDto> updateBook(@RequestBody BookRequestDto bookRequestDto, @PathVariable Long id){
-        BookResponseDto updatedBook = libraryService.updateBook( id, bookRequestDto);
+        BookResponseDto updatedBook = bookService.updateBook( id, bookRequestDto);
 
         return ResponseEntity.ok(updatedBook);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id){
-        libraryService.deleteBook(id);
+        bookService.deleteBook(id);
         return  ResponseEntity.ok("book deleted successfully");
     }
+
 
 
 }

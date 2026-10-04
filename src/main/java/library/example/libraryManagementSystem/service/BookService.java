@@ -3,8 +3,7 @@ package library.example.libraryManagementSystem.service;
 import library.example.libraryManagementSystem.dto.BookRequestDto;
 import library.example.libraryManagementSystem.dto.BookResponseDto;
 import library.example.libraryManagementSystem.entity.Book;
-import library.example.libraryManagementSystem.repository.LibraryRepository;
-import org.springframework.http.ResponseEntity;
+import library.example.libraryManagementSystem.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,12 +12,12 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class LibraryService {
+public class BookService {
 
 
-    private LibraryRepository libraryRepository;
-    public LibraryService(LibraryRepository libraryRepository) {
-        this.libraryRepository = libraryRepository;
+    private BookRepository bookRepository;
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
     public void addBook(BookRequestDto bookRequestDto){
@@ -29,11 +28,11 @@ public class LibraryService {
         book.setAuthor(bookRequestDto.getAuthor());
         book.setPublisher(bookRequestDto.getPublisher());
         book.setIsDeleted(false);
-        libraryRepository.save(book);
+        bookRepository.save(book);
     }
 
     public  Optional<BookResponseDto> getBookById(Long id){
-      return libraryRepository.findByIdAndIsDeletedFalse(id)
+      return bookRepository.findByIdAndIsDeletedFalse(id)
               .map( book -> {
                   BookResponseDto bookResponseDto = new BookResponseDto();
                   bookResponseDto.setName(book.getName());
@@ -46,7 +45,7 @@ public class LibraryService {
     }
 
     public List<BookResponseDto> getAllBook(){
-        return libraryRepository.findAllByIsDeletedFalse()
+        return bookRepository.findAllByIsDeletedFalse()
                 .stream()
                 .map( book-> {
                     BookResponseDto bookResponseDto = new BookResponseDto();
@@ -62,13 +61,13 @@ public class LibraryService {
 
     public BookResponseDto  updateBook(Long id, BookRequestDto bookRequestDto){
 
-        Book bookFound =  libraryRepository.findByIdAndIsDeletedFalse(id).get();
+        Book bookFound =  bookRepository.findByIdAndIsDeletedFalse(id).get();
         bookFound.setName(bookRequestDto.getName());
         bookFound.setAuthor(bookRequestDto.getAuthor());
         bookFound.setPublisher(bookRequestDto.getPublisher());
         bookFound.setIsbn(bookRequestDto.getIsbn());
 
-        Book saved = libraryRepository.save(bookFound);
+        Book saved = bookRepository.save(bookFound);
         BookResponseDto responseDto = new BookResponseDto();
         responseDto.setName(saved.getName());
         responseDto.setAuthor(saved.getAuthor());
@@ -78,11 +77,11 @@ public class LibraryService {
     }
 
     public void deleteBook(Long id){
-       Book book =  libraryRepository.findByIdAndIsDeletedFalse(id)
+       Book book =  bookRepository.findByIdAndIsDeletedFalse(id)
                        .orElseThrow(() -> new RuntimeException("Book not found with this id" + id));
 
            book.setIsDeleted(true);
-           libraryRepository.save(book);
+           bookRepository.save(book);
 
     }
 

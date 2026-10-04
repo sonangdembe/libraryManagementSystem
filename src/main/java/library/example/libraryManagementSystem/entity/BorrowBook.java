@@ -30,5 +30,5 @@ public class BorrowBook {
 
     private LocalDate borrowDate;
     private LocalDate returnDate;
-    private Boolean isBorrowed;
+
 }
