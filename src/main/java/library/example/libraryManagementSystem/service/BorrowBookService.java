@@ -33,7 +33,7 @@ public class BorrowBookService {
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
         Book book = bookRepository.findByIdAndIsDeletedFalse(bookId)
-                .orElseThrow(() -> new RuntimeException("book not found"));
+                .orElseThrow(() -> new RuntimeException("book id not found"));
 
         if(borrowBookRepository.existsByBookIdAndReturnDateIsNull(bookId)){
             throw new RuntimeException("Book is already taken");
@@ -46,6 +46,7 @@ public class BorrowBookService {
 
         borrowBookRepository.save(borrowBook);
     }
+
 
     public void returnBook(Long bookId){
      BorrowBook bookBorrow  = borrowBookRepository.findByBookIdAndReturnDateIsNull(bookId)

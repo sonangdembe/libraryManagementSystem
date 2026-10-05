@@ -3,6 +3,7 @@ package library.example.libraryManagementSystem.service;
 import library.example.libraryManagementSystem.dto.BookRequestDto;
 import library.example.libraryManagementSystem.dto.BookResponseDto;
 import library.example.libraryManagementSystem.entity.Book;
+import library.example.libraryManagementSystem.mapper.BookMapper;
 import library.example.libraryManagementSystem.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,64 +17,37 @@ public class BookService {
 
 
     private BookRepository bookRepository;
-    public BookService(BookRepository bookRepository) {
+    private BookMapper bookMapper;
+    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
     public void addBook(BookRequestDto bookRequestDto){
-
-        Book book = new Book();
-        book.setName(bookRequestDto.getName());
-        book.setIsbn(bookRequestDto.getIsbn());
-        book.setAuthor(bookRequestDto.getAuthor());
-        book.setPublisher(bookRequestDto.getPublisher());
-        book.setIsDeleted(false);
+        Book book = bookMapper.toEntity(bookRequestDto);
         bookRepository.save(book);
     }
 
     public  Optional<BookResponseDto> getBookById(Long id){
       return bookRepository.findByIdAndIsDeletedFalse(id)
-              .map( book -> {
-                  BookResponseDto bookResponseDto = new BookResponseDto();
-                  bookResponseDto.setName(book.getName());
-                  bookResponseDto.setIsbn(book.getIsbn());
-                  bookResponseDto.setAuthor(book.getAuthor());
-                  bookResponseDto.setPublisher(book.getPublisher());
+              .map(bookMapper::toDto);
 
-                  return bookResponseDto;
-              });
     }
 
     public List<BookResponseDto> getAllBook(){
         return bookRepository.findAllByIsDeletedFalse()
                 .stream()
-                .map( book-> {
-                    BookResponseDto bookResponseDto = new BookResponseDto();
-                    bookResponseDto.setName(book.getName());
-                    bookResponseDto.setIsbn(book.getIsbn());
-                    bookResponseDto.setAuthor(book.getAuthor());
-                    bookResponseDto.setPublisher(book.getPublisher());
-
-                    return bookResponseDto;
-                })
+                .map(bookMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public BookResponseDto  updateBook(Long id, BookRequestDto bookRequestDto){
 
-        Book bookFound =  bookRepository.findByIdAndIsDeletedFalse(id).get();
-        bookFound.setName(bookRequestDto.getName());
-        bookFound.setAuthor(bookRequestDto.getAuthor());
-        bookFound.setPublisher(bookRequestDto.getPublisher());
-        bookFound.setIsbn(bookRequestDto.getIsbn());
-
+        Book bookFound =  bookRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new RuntimeException("book not found"));
+        bookMapper.updateEntity(bookFound,bookRequestDto);
         Book saved = bookRepository.save(bookFound);
-        BookResponseDto responseDto = new BookResponseDto();
-        responseDto.setName(saved.getName());
-        responseDto.setAuthor(saved.getAuthor());
-        responseDto.setIsbn(saved.getIsbn());
-        responseDto.setPublisher(saved.getPublisher());
-        return responseDto;
+        return bookMapper.toDto(saved);
     }
 
     public void deleteBook(Long id){

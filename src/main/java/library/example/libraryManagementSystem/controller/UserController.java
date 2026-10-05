@@ -27,14 +27,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserRegisterResponseDto> getUserById(@PathVariable Long id){
-     Optional<UserRegisterResponseDto> userResponse =   userService.getUserById(id);
-     if(userResponse.isPresent()){
-         return ResponseEntity.ok(userResponse.get());
-     }
-        return ResponseEntity.notFound().build();
-    }
+    public ResponseEntity<UserRegisterResponseDto> getUserById(@PathVariable Long id) {
+        Optional<UserRegisterResponseDto> userResponse = userService.getUserById(id);
+        return ResponseEntity.ok(userResponse.get());
 
+    }
     @GetMapping
     public ResponseEntity<List<UserRegisterResponseDto>>  getAllUsers(){
         List<UserRegisterResponseDto>  allUser = userService.getAllUser();

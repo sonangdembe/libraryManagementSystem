@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/library")
+@RequestMapping("/api/book")
 public class BookController {
 
     private BookService bookService;
@@ -30,10 +30,9 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDto> getBookById(@PathVariable Long id){
       Optional<BookResponseDto> foundedBook = bookService.getBookById(id);
-    if(foundedBook.isPresent()){
+
         return ResponseEntity.ok(foundedBook.get());
-    }
-    return ResponseEntity.notFound().build();
+
     }
 
     @GetMapping
