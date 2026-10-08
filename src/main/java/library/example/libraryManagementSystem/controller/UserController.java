@@ -28,8 +28,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserRegisterResponseDto> getUserById(@PathVariable Long id) {
-        Optional<UserRegisterResponseDto> userResponse = userService.getUserById(id);
-        return ResponseEntity.ok(userResponse.get());
+        UserRegisterResponseDto userResponse = userService.getUserById(id);
+        return ResponseEntity.ok(userResponse);
 
     }
     @GetMapping
@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok(allUser);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<UserRegisterResponseDto> updateUser(@RequestBody UserRegisterRequestDto userRegisterRequestDto, @PathVariable Long id){
         UserRegisterResponseDto getUser = userService.updateUser( id, userRegisterRequestDto);
 

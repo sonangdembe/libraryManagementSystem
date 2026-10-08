@@ -7,6 +7,7 @@ import library.example.libraryManagementSystem.dto.UserRegisterRequestDto;
 import library.example.libraryManagementSystem.dto.UserRegisterResponseDto;
 import library.example.libraryManagementSystem.entity.Book;
 import library.example.libraryManagementSystem.entity.User;
+import library.example.libraryManagementSystem.exception.UserNotFoundException;
 import library.example.libraryManagementSystem.mapper.UserMapper;
 import library.example.libraryManagementSystem.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,9 +33,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Optional<UserRegisterResponseDto> getUserById(@PathVariable Long id){
+    public UserRegisterResponseDto getUserById(Long id){
         return  userRepository.findByIdAndIsDeletedFalse(id)
-                .map(userMapper::toDto);
+                .map(userMapper::toDto)
+                .orElseThrow(() -> new UserNotFoundException("User with id"+ id + "not found in database"));
 
     }
 
@@ -47,7 +49,10 @@ public List<UserRegisterResponseDto> getAllUser(){
 }
 
 public UserRegisterResponseDto updateUser(Long id,UserRegisterRequestDto userRegisterRequestDto){
-    User user =  userRepository.findByIdAndIsDeletedFalse(id).get();
+    User user =  userRepository.findByIdAndIsDeletedFalse(id)
+            .orElseThrow(() ->
+                    new UserNotFoundException("User with id " +id + "not found so cannot udpate"));
+
     userMapper.updateUser(user, userRegisterRequestDto);
     User usersaved = userRepository.save(user);
     return userMapper.toDto(usersaved);
@@ -55,7 +60,7 @@ public UserRegisterResponseDto updateUser(Long id,UserRegisterRequestDto userReg
 
 public void deleteUser(Long id){
     User user =  userRepository.findByIdAndIsDeletedFalse(id)
-            .orElseThrow(() -> new RuntimeException("Book not found with this id" + id));
+            .orElseThrow(() -> new UserNotFoundException("Book not found with this id so cannot delete" + id));
 
     user.setIsDeleted(true);
     userRepository.save(user);

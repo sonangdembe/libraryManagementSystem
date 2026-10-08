@@ -29,9 +29,9 @@ public class BookController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDto> getBookById(@PathVariable Long id){
-      Optional<BookResponseDto> foundedBook = bookService.getBookById(id);
+      BookResponseDto foundedBook = bookService.getBookById(id);
 
-        return ResponseEntity.ok(foundedBook.get());
+        return ResponseEntity.ok(foundedBook);
 
     }
 
@@ -41,7 +41,7 @@ public class BookController {
         return ResponseEntity.ok(bookList);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<BookResponseDto> updateBook(@RequestBody BookRequestDto bookRequestDto, @PathVariable Long id){
         BookResponseDto updatedBook = bookService.updateBook( id, bookRequestDto);
 

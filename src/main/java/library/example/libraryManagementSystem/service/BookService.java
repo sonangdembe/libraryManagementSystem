@@ -3,6 +3,7 @@ package library.example.libraryManagementSystem.service;
 import library.example.libraryManagementSystem.dto.BookRequestDto;
 import library.example.libraryManagementSystem.dto.BookResponseDto;
 import library.example.libraryManagementSystem.entity.Book;
+import library.example.libraryManagementSystem.exception.BookNotFoundException;
 import library.example.libraryManagementSystem.mapper.BookMapper;
 import library.example.libraryManagementSystem.repository.BookRepository;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,10 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public  Optional<BookResponseDto> getBookById(Long id){
+    public BookResponseDto getBookById(Long id){
       return bookRepository.findByIdAndIsDeletedFalse(id)
-              .map(bookMapper::toDto);
+              .map(bookMapper::toDto)
+              .orElseThrow(() -> new BookNotFoundException("Book with id " +id + "is not in Database"));
 
     }
 
@@ -44,7 +46,7 @@ public class BookService {
     public BookResponseDto  updateBook(Long id, BookRequestDto bookRequestDto){
 
         Book bookFound =  bookRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RuntimeException("book not found"));
+                .orElseThrow(() -> new BookNotFoundException("book not found with id so cannot update" +id));
         bookMapper.updateEntity(bookFound,bookRequestDto);
         Book saved = bookRepository.save(bookFound);
         return bookMapper.toDto(saved);
@@ -52,7 +54,7 @@ public class BookService {
 
     public void deleteBook(Long id){
        Book book =  bookRepository.findByIdAndIsDeletedFalse(id)
-                       .orElseThrow(() -> new RuntimeException("Book not found with this id" + id));
+                       .orElseThrow(() -> new BookNotFoundException("Book not found with this id so cannot delete" + id));
 
            book.setIsDeleted(true);
            bookRepository.save(book);
